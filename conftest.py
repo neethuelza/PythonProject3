@@ -1,4 +1,4 @@
-# conftest.py ✅
+# conf test.py ✅
 import os
 import pytest
 import allure
@@ -35,7 +35,8 @@ def take_screenshot(driver, test_name):
             attachment_type=allure.attachment_type.PNG
         )
 
-    print(f"📸 Screenshot saved: {screenshot_path}")
+    print(f"Screenshot saved: {screenshot_path}")
+
     return screenshot_path
 
 
