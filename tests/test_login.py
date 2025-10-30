@@ -28,7 +28,7 @@ class TestLogin:
         )
 
         # If this fails, pytest hook will automatically take screenshot
-        assert driver.title == "Orange1HRM"
+        assert driver.title == "OrangeHRM"
 
     def test_logout(self):
         """Test for logging out from the application"""
