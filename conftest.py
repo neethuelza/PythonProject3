@@ -65,9 +65,10 @@ def test_setup(request):
         options.add_argument("--disable-notifications")
         options.add_experimental_option("detach", True)
         driver = webdriver.Chrome(
-            service=ChromeService(ChromeDriverManager().install()),
+            service=ChromeService(ChromeDriverManager().install()),  # removed version="latest"
             options=options
         )
+
 
     elif browser == "firefox":
         options = FFOptions()
