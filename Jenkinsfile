@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         WORKSPACE_DIR = "${WORKSPACE}"
-        ALLURE_REPORT = "${WORKSPACE}/allure-report" // forward slashes for Windows
+        ALLURE_REPORT = "${WORKSPACE_DIR}\\allure-report"
     }
 
     stages {
@@ -17,7 +17,9 @@ pipeline {
             steps {
                 echo 'Running Selenium-Pytest tests via batch file...'
                 timeout(time: 30, unit: 'MINUTES') {  // prevents hanging builds
-                    bat """call "${WORKSPACE_DIR}/run_tests.bat" """
+                    bat """
+                    call "${WORKSPACE_DIR}\\run_tests.bat"
+                    """
                 }
             }
         }
@@ -25,7 +27,9 @@ pipeline {
         stage('Generate Allure Report') {
             steps {
                 echo 'Generating Allure report...'
-                bat """allure generate "${WORKSPACE_DIR}/reports/allure-results" -o "${ALLURE_REPORT}" --clean"""
+                bat """
+                allure generate "${WORKSPACE_DIR}\\reports\\allure-results" -o "${ALLURE_REPORT}" --clean
+                """
             }
         }
     }
