@@ -15,10 +15,23 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo 'Running Selenium-Pytest tests via batch file...'
+                echo 'Running Selenium-Pytest tests directly...'
                 timeout(time: 30, unit: 'MINUTES') {  // prevents hanging builds
                     bat """
-                    call "${WORKSPACE_DIR}\\run_tests.bat"
+                    cd /d ${WORKSPACE_DIR}
+                    echo ================================
+                    echo Starting test execution...
+                    echo ================================
+
+                    REM Activate virtual environment
+                    call C:\\Users\\abyja\\PycharmProjects\\PythonProject3\\.venv\\Scripts\\activate.bat
+
+                    REM Run pytest with Allure results and Chrome browser
+                    pytest -v --alluredir=reports/allure-results --browser chrome
+
+                    echo ================================
+                    echo Test execution completed.
+                    echo ================================
                     """
                 }
             }
