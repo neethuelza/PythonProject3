@@ -55,32 +55,34 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully! Sending success email...'
-            emailext(
-                subject: "✅ Build SUCCESS: ${currentBuild.fullDisplayName}",
-                body: """<p>Hi Neethu,</p>
-                         <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> succeeded.</p>
-                         <p>View Allure report online: <a href='${BUILD_URL}allure-report/index.html'>Allure Report</a></p>
-                         <p>Allure report folder is attached to this email.</p>""",
-                to: "neethuelzageorge@gmail.com",
-                attachmentsPattern: "allure-report/**",
-                mimeType: 'text/html'
-            )
-            echo 'Cleaning workspace...'
-            cleanWs()
-        }
+        always {
+            echo 'Sending email and cleaning workspace...'
+            script {
+                def attachmentPattern = fileExists("${ALLURE_REPORT}") ? 'allure-report/**' : ''
 
-        failure {
-            echo 'Pipeline failed! Sending failure email...'
-            emailext(
-                subject: "❌ Build FAILURE: ${currentBuild.fullDisplayName}",
-                body: """<p>Hi Neethu,</p>
-                         <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
-                         <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>""",
-                to: "neethuelzageorge@gmail.com",
-                mimeType: 'text/html'
-            )
+                if (currentBuild.currentResult == 'SUCCESS') {
+                    emailext(
+                        subject: "✅ Build SUCCESS: ${currentBuild.fullDisplayName}",
+                        body: """<p>Hi Neethu,</p>
+                                 <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> succeeded.</p>
+                                 <p>View Allure report online: <a href='${BUILD_URL}allure-report/index.html'>Allure Report</a></p>
+                                 <p>Allure report folder is attached to this email.</p>""",
+                        to: "neethuelzageorge@gmail.com",
+                        attachmentsPattern: attachmentPattern,
+                        mimeType: 'text/html'
+                    )
+                } else {
+                    emailext(
+                        subject: "❌ Build FAILURE: ${currentBuild.fullDisplayName}",
+                        body: """<p>Hi Neethu,</p>
+                                 <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
+                                 <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>""",
+                        to: "neethuelzageorge@gmail.com",
+                        mimeType: 'text/html'
+                    )
+                }
+            }
+
             echo 'Cleaning workspace...'
             cleanWs()
         }
