@@ -45,12 +45,18 @@ pipeline {
                 """
             }
         }
+
+        stage('Archive Allure Report') {
+            steps {
+                echo 'Archiving Allure report...'
+                archiveArtifacts artifacts: 'allure-report/**', allowEmptyArchive: true
+            }
+        }
     }
 
     post {
-
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline completed successfully! Sending success email...'
             emailext(
                 subject: "✅ Build SUCCESS: ${currentBuild.fullDisplayName}",
                 body: """<p>Hi Neethu,</p>
@@ -61,10 +67,12 @@ pipeline {
                 attachmentsPattern: "allure-report/**",
                 mimeType: 'text/html'
             )
+            echo 'Cleaning workspace...'
+            cleanWs()
         }
 
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed! Sending failure email...'
             emailext(
                 subject: "❌ Build FAILURE: ${currentBuild.fullDisplayName}",
                 body: """<p>Hi Neethu,</p>
@@ -73,9 +81,6 @@ pipeline {
                 to: "neethuelzageorge@gmail.com",
                 mimeType: 'text/html'
             )
-        }
-
-        always {
             echo 'Cleaning workspace...'
             cleanWs()
         }
