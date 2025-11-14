@@ -48,35 +48,34 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Cleaning workspace...'
-            cleanWs()
-        }
+    success {
+        echo 'Pipeline completed successfully!'
+        emailext(
+            subject: "✅ Build SUCCESS: ${currentBuild.fullDisplayName}",
+            body: """<p>Hi Neethu,</p>
+                     <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> succeeded.</p>
+                     <p>View Allure report online: <a href='${BUILD_URL}allure-report/index.html'>Allure Report</a></p>
+                     <p>Allure report folder is attached to this email.</p>""",
+            to: "neethuelzageorge@gmail.com",
+            attachmentsPattern: "allure-report/**",
+            mimeType: 'text/html'
+        )
+    }
 
-        success {
-            echo 'Pipeline completed successfully!'
-            emailext(
-                subject: "✅ Build SUCCESS: ${currentBuild.fullDisplayName}",
-                body: """<p>Hi Neethu,</p>
-                         <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> succeeded.</p>
-                         <p>View Allure report online: <a href='${BUILD_URL}allure-report/index.html'>Allure Report</a></p>
-                         <p>Allure report folder is attached to this email.</p>""",
-                to: "neethuelzageorge@gmail.com",
-                attachmentsPattern: "allure-report/**",
-                mimeType: 'text/html'
-            )
-        }
+    failure {
+        echo 'Pipeline failed!'
+        emailext(
+            subject: "❌ Build FAILURE: ${currentBuild.fullDisplayName}",
+            body: """<p>Hi Neethu,</p>
+                     <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
+                     <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>""",
+            to: "neethuelzageorge@gmail.com",
+            mimeType: 'text/html'
+        )
+    }
 
-        failure {
-            echo 'Pipeline failed!'
-            emailext(
-                subject: "❌ Build FAILURE: ${currentBuild.fullDisplayName}",
-                body: """<p>Hi Neethu,</p>
-                         <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
-                         <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>""",
-                to: "neethuelzageorge@gmail.com",
-                mimeType: 'text/html'
-            )
-        }
+    always {
+        echo 'Cleaning workspace...'
+        cleanWs()
     }
 }
