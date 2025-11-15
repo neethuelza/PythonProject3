@@ -54,8 +54,8 @@ pipeline {
             script {
                 // Compose email
                 def buildStatus = currentBuild.currentResult
-                def emailSubject = buildStatus == 'SUCCESS' ? "✅ Build SUCCESS: ${currentBuild.fullDisplayName}" :
-                                                               "❌ Build FAILURE: ${currentBuild.fullDisplayName}"
+                def emailSubject = buildStatus == 'SUCCESS' ? "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
+                                                               "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
 
                 def emailBody = buildStatus == 'SUCCESS' ?
                     """<p>Hi Neethu,</p>
