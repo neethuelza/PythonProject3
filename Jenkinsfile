@@ -8,16 +8,19 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
+                echo 'Checking out the repository...'
                 git branch: 'master', url: 'https://github.com/neethuelza/PythonProject3.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
+                echo 'Creating virtual environment and installing dependencies...'
                 bat """
                 cd /d ${WORKSPACE_DIR}
+                python -m venv .venv
                 call .venv\\Scripts\\activate.bat
+                pip install --upgrade pip
                 pip install -r requirements.txt
                 """
             }
@@ -52,6 +55,7 @@ pipeline {
     post {
         always {
             script {
+                // Compose email
                 def buildStatus = currentBuild.currentResult
                 def emailSubject = buildStatus == 'SUCCESS' ? "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
                                                                "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
@@ -64,6 +68,7 @@ pipeline {
                        <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
                        <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>"""
 
+                // Email sending
                 emailext(
                     subject: emailSubject,
                     body: emailBody,
@@ -72,6 +77,7 @@ pipeline {
                 )
             }
 
+            // Clean workspace
             cleanWs()
         }
     }
