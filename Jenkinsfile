@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         WORKSPACE_DIR = "${WORKSPACE}"
+        VENV_PATH = "C:\\Users\\neeth\\PycharmProjects\\SAMPLEFRAMEWORK\\.venv\\Scripts\\activate.bat"
+        ALLURE_PATH = "C:\\Users\\neeth\\scoop\\shims"
     }
 
     stages {
@@ -16,9 +18,9 @@ pipeline {
             steps {
                 echo 'Installing dependencies...'
                 bat """
-                cd /d ${WORKSPACE_DIR}
-                call C:\\Users\\abyja\\PycharmProjects\\PythonProject3\\.venv\\Scripts\\activate.bat
-                pip install -r requirements.txt
+                    cd /d ${WORKSPACE_DIR}
+                    call ${VENV_PATH}
+                    pip install -r requirements.txt
                 """
             }
         }
@@ -28,9 +30,9 @@ pipeline {
                 echo 'Running Selenium-Pytest tests with Allure results...'
                 timeout(time: 30, unit: 'MINUTES') {
                     bat """
-                    cd /d ${WORKSPACE_DIR}
-                    call C:\\Users\\abyja\\PycharmProjects\\PythonProject3\\.venv\\Scripts\\activate.bat
-                    pytest -v --alluredir=reports/allure-results --browser chrome
+                        cd /d ${WORKSPACE_DIR}
+                        call ${VENV_PATH}
+                        pytest -v --alluredir=reports/allure-results --browser chrome
                     """
                 }
             }
@@ -41,9 +43,9 @@ pipeline {
                 allure([
                     includeProperties: false,
                     jdk: '',
-                    results: [[path: 'reports/allure-results']],
+                    results: [[path: 'reports/allure-results']],   // raw pytest results
                     reportBuildPolicy: 'ALWAYS',
-                    properties: []
+                    commandline: "${ALLURE_PATH}"                // Allure installation path
                 ])
             }
         }
