@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         WORKSPACE_DIR = "${WORKSPACE}"
-        VENV_PATH = "C:\\Users\\neeth\\PycharmProjects\\SAMPLEFRAMEWORK\\.venv\\Scripts\\activate.bat"
     }
 
     stages {
@@ -17,9 +16,9 @@ pipeline {
             steps {
                 echo 'Installing dependencies...'
                 bat """
-                    cd /d ${WORKSPACE_DIR}
-                    call ${VENV_PATH}
-                    pip install -r requirements.txt
+                cd /d ${WORKSPACE_DIR}
+                call .venv\\Scripts\\activate.bat
+                pip install -r requirements.txt
                 """
             }
         }
@@ -29,9 +28,9 @@ pipeline {
                 echo 'Running Selenium-Pytest tests with Allure results...'
                 timeout(time: 30, unit: 'MINUTES') {
                     bat """
-                        cd /d ${WORKSPACE_DIR}
-                        call ${VENV_PATH}
-                        pytest -v --alluredir=reports/allure-results --browser chrome
+                    cd /d ${WORKSPACE_DIR}
+                    call .venv\\Scripts\\activate.bat
+                    pytest -v --alluredir=reports/allure-results --browser chrome
                     """
                 }
             }
@@ -39,16 +38,14 @@ pipeline {
 
         stage('Publish Allure Report') {
             steps {
-                echo 'Generating Allure report (even if tests fail)...'
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    allure([
-                        includeProperties: false,
-                        jdk: '',
-                        results: [[path: 'reports/allure-results']],
-                        reportBuildPolicy: 'ALWAYS',
-                        installation: 'Allure'  // Make sure this matches the Allure installation name in Jenkins
-                    ])
-                }
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'reports/allure-results']],  // Relative path in workspace
+                    reportBuildPolicy: 'ALWAYS',
+                    properties: [],
+                    installation: 'Allure'  // Must match the name in Jenkins Global Tool Configuration
+                ])
             }
         }
     }
@@ -56,6 +53,7 @@ pipeline {
     post {
         always {
             script {
+                // Compose email
                 def buildStatus = currentBuild.currentResult
                 def emailSubject = buildStatus == 'SUCCESS' ? "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
                                                                "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
@@ -66,8 +64,7 @@ pipeline {
                        <p>View the Allure report online: <a href='${BUILD_URL}allure'>Allure Report</a></p>""" :
                     """<p>Hi Neethu,</p>
                        <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
-                       <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>
-                       <p>View Allure report (if any): <a href='${BUILD_URL}allure'>Allure Report</a></p>"""
+                       <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>"""
 
                 emailext(
                     subject: emailSubject,
@@ -77,7 +74,8 @@ pipeline {
                 )
             }
 
-            cleanWs() // Clean workspace after all actions
+            // Clean workspace after all actions
+            cleanWs()
         }
     }
 }
