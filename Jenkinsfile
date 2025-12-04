@@ -4,7 +4,6 @@ pipeline {
     environment {
         WORKSPACE_DIR = "${WORKSPACE}"
         VENV_PATH = "C:\\Users\\neeth\\PycharmProjects\\SAMPLEFRAMEWORK\\.venv\\Scripts\\activate.bat"
-        ALLURE_PATH = "C:\\allure\\allure-2.35.1\\bin"  // Updated Allure path
     }
 
     stages {
@@ -47,7 +46,7 @@ pipeline {
                         jdk: '',
                         results: [[path: 'reports/allure-results']],
                         reportBuildPolicy: 'ALWAYS',
-                        commandline: "${ALLURE_PATH}"
+                        installation: 'Allure'  // Make sure this matches the Allure installation name in Jenkins
                     ])
                 }
             }
@@ -58,9 +57,8 @@ pipeline {
         always {
             script {
                 def buildStatus = currentBuild.currentResult
-                def emailSubject = buildStatus == 'SUCCESS' ?
-                    "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
-                    "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
+                def emailSubject = buildStatus == 'SUCCESS' ? "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
+                                                               "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
 
                 def emailBody = buildStatus == 'SUCCESS' ?
                     """<p>Hi Neethu,</p>
