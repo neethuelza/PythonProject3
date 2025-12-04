@@ -41,10 +41,9 @@ pipeline {
                 allure([
                     includeProperties: false,
                     jdk: '',
-                    results: [[path: 'reports/allure-results']],  // Relative path in workspace
+                    results: [[path: 'reports/allure-results']],
                     reportBuildPolicy: 'ALWAYS',
-                    properties: [],
-                    installation: 'Allure'  // Must match the name in Jenkins Global Tool Configuration
+                    properties: []
                 ])
             }
         }
@@ -53,7 +52,6 @@ pipeline {
     post {
         always {
             script {
-                // Compose email
                 def buildStatus = currentBuild.currentResult
                 def emailSubject = buildStatus == 'SUCCESS' ? "\u2705 Build SUCCESS: ${currentBuild.fullDisplayName}" :
                                                                "\u274C Build FAILURE: ${currentBuild.fullDisplayName}"
@@ -74,7 +72,6 @@ pipeline {
                 )
             }
 
-            // Clean workspace after all actions
             cleanWs()
         }
     }
