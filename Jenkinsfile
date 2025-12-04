@@ -40,13 +40,16 @@ pipeline {
 
         stage('Publish Allure Report') {
             steps {
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'reports/allure-results']],   // raw pytest results
-                    reportBuildPolicy: 'ALWAYS',
-                    commandline: "${ALLURE_PATH}"                // Allure installation path
-                ])
+                echo 'Generating Allure report (even if tests fail)...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        results: [[path: 'reports/allure-results']],
+                        reportBuildPolicy: 'ALWAYS',
+                        commandline: "${ALLURE_PATH}"
+                    ])
+                }
             }
         }
     }
@@ -65,7 +68,8 @@ pipeline {
                        <p>View the Allure report online: <a href='${BUILD_URL}allure'>Allure Report</a></p>""" :
                     """<p>Hi Neethu,</p>
                        <p>The Jenkins build <b>${currentBuild.fullDisplayName}</b> failed.</p>
-                       <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>"""
+                       <p>Check console output here: <a href='${BUILD_URL}console'>Console Output</a></p>
+                       <p>View Allure report (if any): <a href='${BUILD_URL}allure'>Allure Report</a></p>"""
 
                 emailext(
                     subject: emailSubject,
