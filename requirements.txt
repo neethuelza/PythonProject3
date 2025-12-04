@@ -3,4 +3,6 @@ pytest>=7.0.0             # Pytest 7+ for modern features
 pytest-html>=3.2.0        # Optional HTML reports
 pytest-selenium>=2.0.0    # Integrates Selenium with Pytest
 allure-pytest>=2.0.0      # For Allure reports
+allure-python-commons>=2.0.0
 webdriver-manager>=4.0.0  # Automatically downloads ChromeDriver/EdgeDriver
+
